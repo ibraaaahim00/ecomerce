@@ -1,16 +1,15 @@
 <?php
 
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\ContactController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CartItemController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Api\BannerController;
-
-
+use App\Http\Controllers\Api\CategoryController;
 
 
 /*
@@ -87,3 +86,19 @@ Route::post('reset password', [AuthController::class, 'resetPassword']);
 Route::post('profile', [AuthController::class, 'profile']);
 //BANNAERS
 Route::get('/banners',[BannerController::class,'index']);
+//category
+Route::get('/categories',[CategoryController::class,'index']);
+//Product
+Route::get('/products',[ProductController::class,'index']);
+//cart
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart', [CartController::class, 'store']);
+    Route::put('/cart/{itemId}', [CartController::class, 'update']);
+    Route::delete('/cart/{itemId}', [CartController::class, 'destroy']);
+});
+
+Route::post('/contact', [ContactController::class, 'store']);
+
+
