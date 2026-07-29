@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\OtpRepository;
 use Illuminate\Support\Facades\Mail;
+use App\Exceptions\InvalidOtpException;
 
 class OtpService
 {
@@ -20,10 +21,7 @@ class OtpService
         );
 
         if (!$record) {
-            return [
-                'error' => true,
-                'message' => 'Invalid OTP',
-            ];
+            throw new InvalidOtpException();
         }
 
         return [
