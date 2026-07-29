@@ -8,6 +8,11 @@ use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Api\BannerController;
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Public Auth
@@ -68,6 +73,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('categories/{category}',     [CategoryController::class, 'update']);
     Route::delete('categories/{category}',  [CategoryController::class, 'destroy']);
 });
+
+//AUTH
 Route::post('register',[AuthController::class, 'register']);
 Route::post('login',[AuthController::class, 'login']);
 Route::post('logout',[AuthController::class, 'logout']);
@@ -78,5 +85,5 @@ Route::post('resend-otp', [AuthController::class, 'resendOTP']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
 Route::post('reset password', [AuthController::class, 'resetPassword']);
 Route::post('profile', [AuthController::class, 'profile']);
-
-
+//BANNAERS
+Route::get('/banners',[BannerController::class,'index']);

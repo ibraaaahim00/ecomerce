@@ -14,9 +14,11 @@ class AuthRepository
     public function findByEmail(string $email)
     {
         return User::firstWhere('email', $email);
-
-    public function deleteUserTokens(User $user)
-    {
-        return $user->tokens()->delete();
     }
+        public
+        function deleteUserTokens(User $user)
+        {
+            return $user->tokens()->delete();
+        }
+    
 }
