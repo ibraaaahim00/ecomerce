@@ -22,10 +22,11 @@ class AuthController extends Controller
     use ApiResponseTrait;
 
     public function __construct(
-        private AuthService $authService,
-        private OtpService $otpService,
+        private AuthService          $authService,
+        private OtpService           $otpService,
         private PasswordResetService $passwordResetService
-    ) {
+    )
+    {
     }
 
     public function register(RegisterRequest $request)
@@ -39,7 +40,8 @@ class AuthController extends Controller
     {
         $result = $this->authService->login($request->validated());
 
-        return new AuthResource($result);    }
+        return new AuthResource($result);
+    }
 
     public function logout(Request $request)
     {
@@ -74,6 +76,7 @@ class AuthController extends Controller
 
         return new MessageResource($result);
     }
+
     public function resetPassword(ResetPasswordRequest $request)
     {
         $result = $this->passwordResetService->resetPassword($request->validated());
@@ -81,4 +84,5 @@ class AuthController extends Controller
         return new MessageResource($result);
 
 
+    }
 }
