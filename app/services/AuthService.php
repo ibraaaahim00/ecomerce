@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\UnauthorizedException;
 use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Hash;
 
@@ -35,7 +36,7 @@ class AuthService
         $user = $this->authRepository->findByEmail($data['email']);
 
         if (!$user || !Hash::check($data['password'], $user->password)) {
-            throw new \Exception('Unauthorized');
+            throw new UnauthorizedException('Invalid email or password');
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -51,6 +52,7 @@ class AuthService
         $this->authRepository->deleteUserTokens($user);
 
         return [
+            'success' => true,
             'message' => 'Logged out successfully',
         ];
     }

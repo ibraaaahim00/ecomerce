@@ -2,104 +2,87 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
-use App\Services\AuthService;
+use App\Http\Resources\MessageResource;
+use App\Exceptions\UnauthorizedException;
+use App\Http\Resources\AuthResource;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;use App\Services\AuthService;
 use App\Services\OtpService;
 use App\Services\PasswordResetService;
-
+use App\Http\Requests\Auth\VerifyOtpRequest;
+use App\Http\Requests\Auth\ResendOtpRequest;
 class AuthController extends Controller
 {
+    use ApiResponseTrait;
+
     public function __construct(
-        private AuthService $authService,
-        private OtpService $otpService,
+        private AuthService          $authService,
+        private OtpService           $otpService,
         private PasswordResetService $passwordResetService
-    ) {
+    )
+    {
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|min:6',
-        ]);
+        $result = $this->authService->register($request->validated());
 
-        return response()->json(
-            $this->authService->register($validatedData)
-        );
+        return new AuthResource($result);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validatedData = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $result = $this->authService->login($request->validated());
 
-        try {
-            return response()->json(
-                $this->authService->login($validatedData)
-            );
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => true,
-                'message' => $e->getMessage(),
-            ], 401);
-        }
+        return new AuthResource($result);
     }
 
     public function logout(Request $request)
     {
-        return response()->json(
-            $this->authService->logout($request->user())
-        );
+        $result = $this->authService->logout($request->user());
+
+        return new MessageResource($result);
     }
 
-    public function forgetPassword(Request $request)
+    public function forgetPassword(ForgotPasswordRequest $request)
     {
-        $validatedData = $request->validate([
-            'email' => 'required|email',
-        ]);
+        $result = $this->passwordResetService->forgetPassword(
+            $request->validated()
+        );
 
-        return response()->json([
-            'message' => $this->passwordResetService->forgetPassword($validatedData),
-        ]);
+        return new MessageResource($result);
     }
 
-    public function verifyOtp(Request $request)
+    public function verifyOtp(VerifyOtpRequest $request)
     {
-        $validatedData = $request->validate([
-            'email' => 'required|email',
-            'otp' => 'required',
-        ]);
-
-        return response()->json(
-            $this->otpService->verifyOtp($validatedData)
+        $result = $this->otpService->verifyOtp(
+            $request->validated()
         );
+
+        return new MessageResource($result);
     }
 
-    public function resendOtp(Request $request)
+    public function resendOtp(ResendOtpRequest $request)
     {
-        $validatedData = $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
-
-        return response()->json(
-            $this->otpService->resendOtp($validatedData)
+        $result = $this->otpService->resendOtp(
+            $request->validated()
         );
+
+        return new MessageResource($result);
     }
 
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $validatedData = $request->validate([
-            'email' => 'required|email',
-            'otp' => 'required|digits:6',
-            'password' => 'required|min:6|confirmed',
-        ]);
+        $result = $this->passwordResetService->resetPassword($request->validated());
 
-        return response()->json(
-            $this->passwordResetService->resetPassword($validatedData)
-        );
+        return new MessageResource($result);
+
+
     }
 }

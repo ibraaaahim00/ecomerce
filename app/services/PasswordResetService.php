@@ -4,7 +4,8 @@ namespace App\Services;
 
 use App\Repositories\PasswordResetRepository;
 use Illuminate\Support\Facades\Mail;
-
+use App\Models\User;
+use App\Exceptions\EmailNotFoundException;
 class PasswordResetService
 {
     protected $passwordResetRepository;
@@ -16,7 +17,12 @@ class PasswordResetService
 
     public function forgetPassword(array $data)
     {
-        $otp = mt_rand(100000, 999999);
+        $user = User::firstWhere('email', $data['email']);
+        if (!$user) {
+            throw new EmailNotFoundException();
+        }
+
+        $otp = mt_rand(100000,999999);
 
         $this->passwordResetRepository->saveOtp(
             $data['email'],
@@ -33,7 +39,6 @@ class PasswordResetService
             'message' => 'OTP sent successfully'
         ];
     }
-
     public function resetPassword(array $data)
     {
         return $this->passwordResetRepository->resetPassword($data);

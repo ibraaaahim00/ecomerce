@@ -5,7 +5,14 @@ namespace App\Repositories;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Exceptions\InvalidOtpException;
+use App\Exceptions\EmailNotFoundException;
 
+...
+
+if (!$record) {
+    throw new InvalidOtpException();
+}
 class PasswordResetRepository
 {
     public function saveOtp($email, $otp)
@@ -30,19 +37,21 @@ class PasswordResetRepository
             ->first();
 
         if (!$record) {
-            return [
-                'success' => false,
-                'message' => 'Invalid OTP',
-            ];
+            throw new InvalidOtpException();
+
         }
 
-        $user = User::where('email', $data['email'])->first();
-
+        $user = User::firstWhere('email', $data['email']);
         if (!$user) {
             return [
                 'success' => false,
                 'message' => 'User not found',
             ];
+        }
+
+        $user = User::firstWhere('email', $data['email']);
+        if (!$user) {
+            throw new EmailNotFoundException();
         }
 
         $user->update([
